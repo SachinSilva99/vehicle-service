@@ -1,16 +1,14 @@
 package com.sachin.vehicleservice.api;
 
 import com.sachin.vehicleservice.dto.VehicleDTO;
+import com.sachin.vehicleservice.exception.ImageFileException;
 import com.sachin.vehicleservice.service.VehicleService;
 import com.sachin.vehicleservice.util.StandardResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -25,24 +23,79 @@ public class VehicleController {
     private final VehicleService vehicleService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<StandardResponse> createVehicle(
+    public ResponseEntity<StandardResponse<String>> createVehicle(
             @RequestPart VehicleDTO vehicleDTO,
-            @RequestPart List<MultipartFile> vehicleImages
-    ) {
-
-        List<String> imageList = vehicleImages.stream().map(multipartFile -> {
-            try {
-                return Base64.getEncoder().encodeToString(multipartFile.getBytes());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).toList();
-        vehicleDTO.setVehicleImagesStrings(imageList);
-//        System.out.println(vehicleDTO);
-//        System.out.println(vehicleImages);
+            @RequestPart MultipartFile vehicleMainImage,
+            @RequestPart MultipartFile vehicleImgFront,
+            @RequestPart MultipartFile vehicleImgBack,
+            @RequestPart MultipartFile vehicleImgFrontInterior,
+            @RequestPart MultipartFile vehicleImgBackInterior
+    ) throws IOException {
+        vehicleDTO.setVehicleMainImage(validateAndConvertToString(vehicleMainImage));
+        vehicleDTO.setVehicleImgFront(validateAndConvertToString(vehicleImgFront));
+        vehicleDTO.setVehicleImgBack(validateAndConvertToString(vehicleImgBack));
+        vehicleDTO.setVehicleImgFrontInterior(validateAndConvertToString(vehicleImgFrontInterior));
+        vehicleDTO.setVehicleImgBackInterior(validateAndConvertToString(vehicleImgBackInterior));
         String vehicleId = vehicleService.createVehicle(vehicleDTO);
         return new ResponseEntity<>(
-                new StandardResponse(HttpStatus.CREATED.value(), "OK", vehicleId),
+                new StandardResponse<>(HttpStatus.CREATED.value(), "CREATED Vehicle", vehicleId),
                 HttpStatus.CREATED);
+    }
+
+    @PutMapping(value = "/{vehicleId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<StandardResponse<String>> createUpdate(
+            @PathVariable String vehicleId,
+            @RequestPart VehicleDTO vehicleDTO,
+            @RequestPart(required = false) MultipartFile vehicleMainImage,
+            @RequestPart(required = false) MultipartFile vehicleImgFront,
+            @RequestPart(required = false) MultipartFile vehicleImgBack,
+            @RequestPart(required = false) MultipartFile vehicleImgFrontInterior,
+            @RequestPart(required = false) MultipartFile vehicleImgBackInterior
+    ) throws IOException {
+        setImagesIfNotNullInDto(vehicleDTO, vehicleMainImage, vehicleImgFront, vehicleImgBack, vehicleImgFrontInterior, vehicleImgBackInterior);
+        vehicleService.updateVehicle(vehicleId, vehicleDTO);
+        return new ResponseEntity<>(
+                new StandardResponse<>(),
+                HttpStatus.NO_CONTENT);
+    }
+
+    private void setImagesIfNotNullInDto(
+            VehicleDTO vehicleDTO,
+            MultipartFile vehicleMainImage,
+            MultipartFile vehicleImgFront,
+            MultipartFile vehicleImgBack,
+            MultipartFile vehicleImgFrontInterior,
+            MultipartFile vehicleImgBackInterior) throws IOException {
+        if (vehicleMainImage != null) {
+            vehicleDTO.setVehicleMainImage(validateAndConvertToString(vehicleMainImage));
+        }
+        if (vehicleImgFront != null) {
+            vehicleDTO.setVehicleImgFront(validateAndConvertToString(vehicleImgFront));
+        }
+        if (vehicleImgBack != null) {
+            vehicleDTO.setVehicleImgBack(validateAndConvertToString(vehicleImgBack));
+        }
+        if (vehicleImgFrontInterior != null) {
+            vehicleDTO.setVehicleImgFrontInterior(validateAndConvertToString(vehicleImgFrontInterior));
+        }
+        if (vehicleImgBackInterior != null) {
+            vehicleDTO.setVehicleImgBackInterior(validateAndConvertToString(vehicleImgBackInterior));
+        }
+    }
+
+    @GetMapping("/{vehicleId}")
+    public ResponseEntity<StandardResponse<VehicleDTO>> getVehicle(@PathVariable String vehicleId) {
+        VehicleDTO vehicle = vehicleService.getVehicle(vehicleId);
+        return new ResponseEntity<>(
+                new StandardResponse<>(HttpStatus.OK.value(), "OK", vehicle),
+                HttpStatus.CREATED);
+    }
+
+    private String validateAndConvertToString(MultipartFile file) throws IOException {
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new ImageFileException("Invalid image file. Only image files are allowed.");
+        }
+        return Base64.getEncoder().encodeToString(file.getBytes());
     }
 }

@@ -1,9 +1,9 @@
 package com.sachin.vehicleservice.repo;
 
 import com.sachin.vehicleservice.entity.Vehicle;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface VehicleRepo extends JpaRepository<Vehicle,String> {
+public interface VehicleRepo extends MongoRepository<Vehicle,String> {
 }
