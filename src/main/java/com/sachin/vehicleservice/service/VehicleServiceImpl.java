@@ -34,6 +34,9 @@ public class VehicleServiceImpl implements VehicleService {
             vehicle.setVehicleMainImage(dto.getVehicleMainImage());
         }
         vehicle.setVehicleCategory(dto.getVehicleCategory());
+        vehicle.setVehicleName(dto.getVehicleName());
+        vehicle.setFeeForOneDay100km(dto.getFeeForOneDay100km());
+        vehicle.setFeeForExtra1km(dto.getFeeForExtra1km());
         vehicle.setVehicleRemarks(dto.getVehicleRemarks());
         vehicle.setVehicleDriverName(dto.getVehicleDriverName());
         vehicle.setVehicleDriverContact(dto.getVehicleDriverContact());

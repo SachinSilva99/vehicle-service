@@ -5,6 +5,7 @@ import com.sachin.vehicleservice.entity.enums.VehicleFuelType;
 import com.sachin.vehicleservice.entity.enums.VehicleTransmission;
 import com.sachin.vehicleservice.entity.enums.VehicleType;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,8 @@ public class Vehicle {
     private String vehicleId;
     @NotNull
     private String vehicleBrand;
+    @NotBlank
+    private String vehicleName;
     private VehicleCategory vehicleCategory;
     @NotNull
     private VehicleFuelType vehicleFuelType;
@@ -43,6 +46,10 @@ public class Vehicle {
 
     @NotNull
     private String vehicleMainImage;
+
+
+    private double feeForOneDay100km;
+    private double feeForExtra1km;
 
     @NotNull
     private String vehicleImgFront;

@@ -18,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/v1/vehicles", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class VehicleController {
 
     private final VehicleService vehicleService;
@@ -88,6 +89,20 @@ public class VehicleController {
         VehicleDTO vehicle = vehicleService.getVehicle(vehicleId);
         return new ResponseEntity<>(
                 new StandardResponse<>(HttpStatus.OK.value(), "OK", vehicle),
+                HttpStatus.CREATED);
+    }
+    @DeleteMapping("/{vehicleId}")
+    public ResponseEntity<StandardResponse<VehicleDTO>> deleteVehicle(@PathVariable String vehicleId) {
+        vehicleService.deleteVehicle(vehicleId);
+        return new ResponseEntity<>(
+                new StandardResponse<>(),
+                HttpStatus.CREATED);
+    }
+    @GetMapping
+    public ResponseEntity<StandardResponse<List<VehicleDTO>>> GetALl() {
+        List<VehicleDTO> vehicleDTOS = vehicleService.getAll();
+        return new ResponseEntity<>(
+                new StandardResponse<>(HttpStatus.OK.value(), "OK", vehicleDTOS),
                 HttpStatus.CREATED);
     }
 

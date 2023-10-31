@@ -6,14 +6,14 @@ import com.sachin.vehicleservice.entity.enums.VehicleFuelType;
 import com.sachin.vehicleservice.entity.enums.VehicleTransmission;
 import com.sachin.vehicleservice.entity.enums.VehicleType;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,6 +27,8 @@ public class VehicleDTO {
 
     @NotBlank
     private String vehicleBrand;
+    @NotBlank
+    private String vehicleName;
 
     @NotNull
     private VehicleCategory vehicleCategory;
@@ -35,13 +37,13 @@ public class VehicleDTO {
 
     @DecimalMin(value = "1", message = "The vehicle Fuel Consumption more than least 1")
     private double vehicleFuelConsumption;
+
     @NotNull
     private Boolean vehicleIsHybrid;
 
     @Min(value = 1, message = "The number of seats must be at least 1")
     private int vehicleNoOfSeats;
     @NotNull
-
     private VehicleType vehicleType;
     @NotNull
     private VehicleTransmission vehicleTransmission;
@@ -51,6 +53,9 @@ public class VehicleDTO {
     private String vehicleDriverName;
     @NotNull
     private String vehicleDriverContact;
+
+    private double feeForOneDay100km;
+    private double feeForExtra1km;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String vehicleMainImage;
